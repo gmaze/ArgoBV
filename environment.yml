@@ -57,5 +57,5 @@ dependencies:
 #  - sphinx = -
 
   - pip:
-      - streamlit==1.26.0
+#      - streamlit==1.26.0
       - git+https://github.com/euroargodev/argopy
