@@ -272,7 +272,7 @@ apptitle = "Argo BV"
 st.set_page_config(page_title=apptitle, page_icon="🌊", layout='wide')
 
 ## Main Header
-st.title("Argo BV")
+# st.title("Argo BV")
 st.markdown(
     "This app downloads Argo profile data for a specified region and date range. The data is then processed to show representative temperature, salinity,and Brunt-Väisälä (BV) frequency (calculated from the gsw toolbox). Look at the code [here](https://github.com/st-howard/ArgoBV)"
 )
@@ -288,6 +288,8 @@ params = {**default_params, **user_params}
 # )
 ## Sidebar
 with st.sidebar:
+    st.sidebar.image("https://argopy.readthedocs.io/en/refactor-utils/_static/argopy_logo_long.png", caption="")
+
     st.markdown("## 1. Select Region")
     with st.form("Draw Region"):
         ## Select Region
@@ -731,7 +733,7 @@ with BVContainer:
 
 ## Plots within main panel
 # tempCol, salCol = st.columns(2)
-BVCol, tempCol, salCol = st.columns(3)
+BVCol, tempCol, salCol = st.columns([2, 1, 1])
 
 with BVCol:
     if "data" in st.session_state:
