@@ -203,7 +203,7 @@ def processDataFrame(DF, depthMax=500):
 ## Define the data retrieval function
 @st.cache_data(ttl=86400)
 def getArgoData(
-    min_lon, max_lon, min_lat, max_lat, min_depth, max_depth, start_date, end_date
+    min_lon, max_lon, min_lat, max_lat, min_depth, max_depth, start_date, end_date,
 ):
     """
     getArgoData - uses argopy and Argo API's to retrieve profile's as xarray datasets
@@ -219,50 +219,55 @@ def getArgoData(
 
     returns - profilesDF - a pandas dataframe of all the profiles
     """
-    ds = (
-        argopy.DataFetcher(src="erddap")
-        .region(
-            [
-                min_lon,
-                max_lon,
-                min_lat,
-                max_lat,
-                min_depth,
-                max_depth,
-                start_date.strftime("%x"),
-                end_date.strftime("%x"),
-            ]
+    with st.status("Getting the data...", expanded=True) as status:
+        st.write("Downloading...")
+        ds = (
+            argopy.DataFetcher(src="erddap")
+            .region(
+                [
+                    min_lon,
+                    max_lon,
+                    min_lat,
+                    max_lat,
+                    min_depth,
+                    max_depth,
+                    start_date.strftime("%x"),
+                    end_date.strftime("%x"),
+                ]
+            )
+            .to_xarray()
         )
-        .to_xarray()
-    )
+        st.write("Transforming %i points to profiles..." % ds.argo.N_POINTS)
+        ds_profiles = ds.argo.point2profile()
 
-    ds_profiles = ds.argo.point2profile()
+        st.session_state.netcdf = ds_profiles
 
-    st.session_state.netcdf = ds_profiles
+        ## Turn the dataset into a pandas dataframe so it can be cached
+        st.write("Create dataframe with %i profiles..." % ds_profiles.argo.N_PROF)
+        num_profiles = ds_profiles.dims.get("N_PROF")
+        coords_names = list(ds_profiles.coords)
+        coords_names.remove("N_LEVELS")  # Levels is number of depth points, not profiles
+        coords_names.remove("TIME")
+        data_rows = []
+        for i in range(num_profiles):
+            coord_dict = {
+                ds_key: ds_profiles[ds_key][i].to_numpy() for ds_key in coords_names
+            }
+            data_dict = {
+                ds_key: ds_profiles[ds_key][i].to_numpy()
+                for ds_key in list(ds_profiles.keys())
+            }
+            time_dict = {"TIME": pd.to_datetime(ds_profiles["TIME"][i].values)}
+            combined_dict = {**coord_dict, **data_dict, **time_dict}
+            data_rows.append(combined_dict)
 
-    ## Turn the dataset into a pandas dataframe so it can be cached
-    num_profiles = ds_profiles.dims.get("N_PROF")
-    coords_names = list(ds_profiles.coords)
-    coords_names.remove("N_LEVELS")  # Levels is number of depth points, not profiles
-    coords_names.remove("TIME")
-    data_rows = []
-    for i in range(num_profiles):
-        coord_dict = {
-            ds_key: ds_profiles[ds_key][i].to_numpy() for ds_key in coords_names
-        }
-        data_dict = {
-            ds_key: ds_profiles[ds_key][i].to_numpy()
-            for ds_key in list(ds_profiles.keys())
-        }
-        time_dict = {"TIME": pd.to_datetime(ds_profiles["TIME"][i].values)}
-        combined_dict = {**coord_dict, **data_dict, **time_dict}
-        data_rows.append(combined_dict)
+        profilesDF = pd.DataFrame(data_rows)
 
-    profilesDF = pd.DataFrame(data_rows)
-    profilesDF = processDataFrame(profilesDF, depthMax=max_depth)
+        st.write("Process dataframe...")
+        profilesDF = processDataFrame(profilesDF, depthMax=max_depth)
 
+        status.update(label="Download complete!", state="complete")
     return profilesDF
-
 
 ### Page layout
 
@@ -280,12 +285,7 @@ st.markdown("*Note*: If __Get Data__ fails, try again or reduce data from query"
 default_params = {'lon_min': [-80], 'lon_max': [-50], 'lat_min': [20], 'lat_max': [45]}
 user_params = st.experimental_get_query_params()
 params = {**default_params, **user_params}
-# st.write(params['lon_min'])
 
-# st.experimental_set_query_params(
-#     lon_min=-80,
-#     lon_max=-10,
-# )
 ## Sidebar
 with st.sidebar:
     st.sidebar.image("https://argopy.readthedocs.io/en/refactor-utils/_static/argopy_logo_long.png", caption="")
@@ -349,21 +349,35 @@ with st.sidebar:
         ## Retrieve Data
         btnResult = st.form_submit_button("Get Data!")
         if btnResult:
-            with st.spinner("Getting the data..."):
-                profilesDF = getArgoData(
-                    minLon,
-                    maxLon,
-                    minLat,
-                    maxLat,
-                    depthRange[0],
-                    depthRange[1],
-                    startDate,
-                    endDate,
-                )
-                if "data" not in st.session_state:
-                    st.session_state.data = profilesDF
-                else:
-                    st.session_state.data = profilesDF
+            profilesDF = getArgoData(
+                minLon,
+                maxLon,
+                minLat,
+                maxLat,
+                depthRange[0],
+                depthRange[1],
+                startDate,
+                endDate,
+            )
+            if "data" not in st.session_state:
+                st.session_state.data = profilesDF
+            else:
+                st.session_state.data = profilesDF
+            # with st.spinner("Getting the data..."):
+            #     profilesDF = getArgoData(
+            #         minLon,
+            #         maxLon,
+            #         minLat,
+            #         maxLat,
+            #         depthRange[0],
+            #         depthRange[1],
+            #         startDate,
+            #         endDate,
+            #     )
+            #     if "data" not in st.session_state:
+            #         st.session_state.data = profilesDF
+            #     else:
+            #         st.session_state.data = profilesDF
 
 
 # Layout of main panel in container
