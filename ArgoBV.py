@@ -293,27 +293,40 @@ with st.sidebar:
     st.markdown("## 1. Select Region")
     with st.form("Draw Region"):
         ## Select Region
-
-        minLon = st.number_input(
-            "Min Lon",
-            value=float(params['lon_min'][0]),
-            min_value=-180.0,
-            max_value=180.0,
-            key="minLon_range",
-        )
-        maxLon = st.number_input(
-            "Max Lon",
-            value=float(params['lon_max'][0]),
-            min_value=-180.0,
-            max_value=180.0,
-            key="maxLon_range",
-        )
-        minLat = st.number_input(
-            "Min Lat", value=float(params['lat_min'][0]), min_value=-90.0, max_value=90.0, key="minLat_range"
-        )
-        maxLat = st.number_input(
-            "Max Lat", value=float(params['lat_max'][0]), min_value=-90.0, max_value=90.0, key="maxLat_range"
-        )
+        MinCol, MaxCol = st.columns([1, 1])
+        with MinCol:
+            minLon = st.number_input(
+                "Min Lon",
+                value=float(params['lon_min'][0]),
+                min_value=-180.0,
+                max_value=180.0,
+                key="minLon_range",
+            )
+        with MaxCol:
+            maxLon = st.number_input(
+                "Max Lon",
+                value=float(params['lon_max'][0]),
+                min_value=-180.0,
+                max_value=180.0,
+                key="maxLon_range",
+            )
+        MinCol, MaxCol = st.columns([1, 1])
+        with MinCol:
+            minLat = st.number_input(
+                "Min Lat",
+                value=float(params['lat_min'][0]),
+                min_value=-90.0,
+                max_value=90.0,
+                key="minLat_range"
+            )
+        with MaxCol:
+            maxLat = st.number_input(
+                "Max Lat",
+                value=float(params['lat_max'][0]),
+                min_value=-90.0,
+                max_value=90.0,
+                key="maxLat_range"
+            )
 
         if minLon > maxLon:
             maxLon, minLon = minLon, maxLon
@@ -327,22 +340,25 @@ with st.sidebar:
     ## Select Date Range
     end = now = pd.to_datetime('now')
     start = end - pd.to_timedelta(10, unit='days')
-    startDate = st.date_input(
-        "Start Date",
-        value=datetime.date(start.year, start.month, start.day),
-        min_value=datetime.date(1999, 1, 1),
-        max_value=datetime.date.today(),
-    )
-    endDate = st.date_input(
-        "End Date",
-        value=datetime.date.today(),
-        min_value=datetime.date(1999, 1, 1),
-        max_value=datetime.date.today(),
-    )
+    Col1, Col2 = st.columns([1, 1])
+    with Col1:
+        startDate = st.date_input(
+            "Start Date",
+            value=datetime.date(start.year, start.month, start.day),
+            min_value=datetime.date(1999, 1, 1),
+            max_value=datetime.date.today(),
+        )
+    with Col2:
+        endDate = st.date_input(
+            "End Date",
+            value=datetime.date.today(),
+            min_value=datetime.date(1999, 1, 1),
+            max_value=datetime.date.today(),
+        )
 
     st.markdown("## 3. Select Depth")
     ## Select Depth Range
-    depthRange = st.slider("Select a depth range for data (db)", 0, 6000, (0, 1000))
+    depthRange = st.slider("Select a depth range for data (db)", 0, 6000, (0, 1000), step=5)
 
     st.markdown("## 4. Get Argo Data")
     with st.form("Data Request Parameters"):
