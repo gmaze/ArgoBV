@@ -1,6 +1,6 @@
-# ArgoBV
+# Argopy-ArgoBV
 
-Try the app here! [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/st-howard/ArgoBV/main/ArgoBV.py)
+Try the app here! [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://argopy.streamlit.app)
 
 A [streamlit app](https://streamlit.io/) to quickly look at [Brunt-Väisälä (BV) frequency](https://en.wikipedia.org/wiki/Brunt%E2%80%93V%C3%A4is%C3%A4l%C3%A4_frequency) profiles from in situ [Argo](https://argo.ucsd.edu/) profiles. Utilizes the [argopy package](https://argopy.readthedocs.io/en/latest/) to retrieve the data and [gsw package](https://teos-10.github.io/GSW-Python/) to calculate the BV profiles.
 
