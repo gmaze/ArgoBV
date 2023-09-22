@@ -201,7 +201,7 @@ def processDataFrame(DF, depthMax=500):
 
 
 ## Define the data retrieval function
-@st.cache_data(max_entries=1)
+@st.cache_data(ttl=86400)
 def getArgoData(
     min_lon, max_lon, min_lat, max_lat, min_depth, max_depth, start_date, end_date
 ):
@@ -274,7 +274,7 @@ st.set_page_config(page_title=apptitle, page_icon="🌊", layout='wide')
 ## Main Header
 # st.title("Argo BV")
 st.markdown(
-    "This app downloads Argo profile data for a specified region and date range. The data is then processed to show representative temperature, salinity,and Brunt-Väisälä (BV) frequency (calculated from the gsw toolbox). Look at the code [here](https://github.com/st-howard/ArgoBV)"
+    "This app downloads Argo profile data for a specified region and date range. The data is then processed to show representative temperature, salinity,and Brunt-Väisälä (BV) frequency (calculated from the gsw toolbox). Look at the code [here](https://github.com/gmaze/ArgoBV)"
 )
 st.markdown("*Note*: If __Get Data__ fails, try again or reduce data from query")
 default_params = {'lon_min': [-80], 'lon_max': [-50], 'lat_min': [20], 'lat_max': [45]}
