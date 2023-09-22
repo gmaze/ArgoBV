@@ -1,15 +1,12 @@
-name: base
-channels:
-  - conda-forge
 dependencies:
-  - python = 3.8
 
-  - plotly = 5.9.0
-  - watchdog = 2.1.6
+  - plotly
+  - watchdog
 
-  - gsw = 3.6.16
-  - pyarrow = 12.0.0
+  - gsw
+  - pyarrow
 
-  - pip = 23.1.2
+  - pip
   - pip:
+      - streamlit
       - git+https://github.com/euroargodev/argopy
