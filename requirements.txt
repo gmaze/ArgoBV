@@ -2,3 +2,8 @@ argopy==0.1.14rc2
 plotly
 streamlit
 gsw
+pandas
+numpy
+xarray
+matplotlib
+scipy
